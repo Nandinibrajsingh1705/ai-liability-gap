@@ -1,1066 +1,565 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>The Liability Vacuum — Interactive Research Dossier</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-
-<style>
-
-:root {
-
---accent: #6366f1;
-
---danger: #f43f5e;
-
---success: #10b981;
-
---gold: #f59e0b;
-
---bg: #0a0a0c;
-
---panel: #16161a;
-
-}
-
-
-
-body {
-
-font-family: 'Inter', sans-serif;
-
-background-color: var(--bg);
-
-color: #f1f5f9;
-
-overflow-x: hidden;
-
-scroll-behavior: smooth;
-
-}
-
-
-
-.heading { font-family: 'Space Grotesk', sans-serif; }
-
-.mono { font-family: 'IBM Plex Mono', monospace; }
-
-
-
-/* Cinematic Background */
-
-.grid-bg {
-
-background-image: radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.1) 1px, transparent 0);
-
-background-size: 40px 40px;
-
-}
-
-
-
-.glass-panel {
-
-background: var(--panel);
-
-border: 1px solid rgba(255, 255, 255, 0.1);
-
-border-radius: 24px;
-
-transition: all 0.3s ease;
-
-}
-
-
-
-.glass-panel:hover {
-
-border-color: var(--accent);
-
-box-shadow: 0 0 40px rgba(99, 102, 241, 0.05);
-
-}
-
-
-
-/* Drag and Drop Styling */
-
-.drag-item {
-
-cursor: grab;
-
-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-}
-
-.drag-item:active { cursor: grabbing; transform: scale(0.95); }
-
-
-.drop-zone {
-
-border: 2px dashed rgba(255, 255, 255, 0.1);
-
-background: rgba(255, 255, 255, 0.02);
-
-transition: all 0.3s ease;
-
-}
-
-.drop-zone.dragover {
-
-border-color: var(--accent);
-
-background: rgba(99, 102, 241, 0.05);
-
-transform: scale(1.02);
-
-}
-
-
-
-/* Nav Animations */
-
-.reveal-section { display: none; opacity: 0; transform: translateY(30px); }
-
-.visible { display: block; opacity: 1; transform: translateY(0); transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1); }
-
-
-
-#network-canvas { width: 100%; height: 80px; display: block; }
-
-
-.defense-card {
-
-border-left: 4px solid #334155;
-
-transition: all 0.3s;
-
-}
-
-.defense-card.active {
-
-border-left-color: var(--danger);
-
-background: rgba(244, 63, 94, 0.03);
-
-}
-
-
-
-/* Scanline for "Digital Archive" vibe */
-
-.scanline::after {
-
-content: "";
-
-position: fixed;
-
-inset: 0;
-
-background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-
-background-size: 100% 4px, 3px 100%;
-
-pointer-events: none;
-
-z-index: 1000;
-
-opacity: 0.2;
-
-}
-
-
-
-::-webkit-scrollbar { width: 6px; }
-
-::-webkit-scrollbar-track { background: var(--bg); }
-
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Liability Vacuum — Interactive Research Dossier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --accent: #6366f1;
+            --danger: #f43f5e;
+            --success: #10b981;
+            --gold: #f59e0b;
+            --bg: #0a0a0c;
+            --panel: #16161a;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg);
+            color: #f1f5f9;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .heading { font-family: 'Space Grotesk', sans-serif; }
+        .mono { font-family: 'IBM Plex Mono', monospace; }
+
+        /* Cinematic Background */
+        .grid-bg {
+            background-image: radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.1) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        .glass-panel {
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.05);
+        }
+
+        .drag-item {
+            cursor: grab;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .drag-item:active { cursor: grabbing; transform: scale(0.95); }
+        
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s ease;
+        }
+        .drop-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.05);
+            transform: scale(1.02);
+        }
+
+        .reveal-section { display: none; opacity: 0; transform: translateY(30px); }
+        .visible { display: block; opacity: 1; transform: translateY(0); transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1); }
+
+        #network-canvas { width: 100%; height: 80px; display: block; }
+        
+        .defense-card {
+            border-left: 4px solid #334155;
+            transition: all 0.3s;
+        }
+        .defense-card.active {
+            border-left-color: var(--danger);
+            background: rgba(244, 63, 94, 0.03);
+        }
+
+        /* Delegation Animation */
+        .data-packet {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 40px;
+            background: linear-gradient(to right, transparent, var(--accent), transparent);
+            animation: data-flow 1.5s infinite linear;
+            opacity: 0;
+        }
+
+        @keyframes data-flow {
+            0% { left: -40px; opacity: 0; }
+            50% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
+        }
+
+        .scanline::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.2;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
 </head>
-
 <body class="grid-bg min-h-screen scanline">
 
-
-
-<!-- HERO SECTION -->
-
-<header id="hero" class="h-screen flex flex-col items-center justify-center px-6 relative text-center">
-
-<div class="z-10 max-w-5xl space-y-10">
-
-<div class="inline-flex items-center gap-2 px-4 py-1.5 border border-indigo-500/30 rounded-full bg-indigo-500/5 text-indigo-400 font-bold tracking-[0.2em] text-xs uppercase">
-
-<span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-
-ICE-2 Research Project · 2025–26
-
-</div>
-
-<h1 class="heading text-7xl md:text-9xl font-black leading-none tracking-tight uppercase">
-
-The <span class="text-indigo-500 italic">Liability</span><br>Vacuum
-
-</h1>
-
-<p class="max-w-3xl mx-auto text-slate-400 text-xl font-light leading-relaxed">
-
-Autonomous agents delegating to other agents across legal entities creates a <span class="text-white font-semibold">Causal Fog</span>. Explore the breakdown of traditional tort law or audit your own scenario.
-
-</p>
-
-<div class="pt-10 flex flex-col md:flex-row gap-6 justify-center">
-
-<button onclick="startFlow('study')" class="px-12 py-5 bg-white text-black heading font-bold text-sm tracking-widest uppercase hover:bg-indigo-500 hover:text-white transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_50px_rgba(255,255,255,0.1)]">
-
-Start Case Study
-
-</button>
-
-<button onclick="startFlow('sandbox')" class="px-12 py-5 bg-transparent border-2 border-slate-700 text-white heading font-bold text-sm tracking-widest uppercase hover:bg-slate-800 transition-all">
-
-Global Sandbox Audit
-
-</button>
-
-</div>
-
-<div class="pt-12">
-
-<p class="mono text-[10px] text-slate-500 uppercase tracking-widest">Researcher: Nandini Braj Singh · Distributed Causation Theory</p>
-
-</div>
-
-</div>
-
-</header>
-
-
-
-<!-- STICKY MONITOR BAR -->
-
-<div id="monitor-bar" class="hidden sticky top-0 z-[100] bg-black/90 backdrop-blur-xl border-b border-white/5 py-4">
-
-<div class="max-w-6xl mx-auto px-8 flex items-center justify-between">
-
-<div class="flex items-center gap-4">
-
-<div class="w-3 h-3 rounded-full bg-indigo-500 animate-pulse" id="status-dot"></div>
-
-<span id="status-text" class="mono text-[10px] uppercase text-indigo-400 font-bold tracking-widest">Network: Handshake Awaiting</span>
-
-</div>
-
-<canvas id="network-canvas"></canvas>
-
-<div class="flex gap-4">
-
-<button onclick="location.reload()" class="mono text-[10px] text-slate-500 hover:text-white uppercase transition-colors underline">Reset</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-
-<main id="main-content" class="max-w-6xl mx-auto px-6 pb-40">
-
-
-
-<!-- STEP 01: THE INSTRUCTION (INTERACTIVE) -->
-
-<section id="ch1" class="reveal-section py-40">
-
-<div class="grid lg:grid-cols-2 gap-24 items-center">
-
-<div class="space-y-10">
-
-<div class="inline-flex items-center gap-3">
-
-<span class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center mono text-sm font-bold text-indigo-400">01</span>
-
-<span class="mono text-xs uppercase tracking-widest text-slate-500">The Human Intent</span>
-
-</div>
-
-<h2 class="heading text-6xl font-bold leading-tight">A single instruction.<br><span class="text-slate-500 italic">No guardrails set.</span></h2>
-
-<div class="p-8 bg-white/5 border border-white/10 rounded-3xl space-y-4">
-
-<p class="text-slate-300 leading-relaxed text-lg italic">
-
-"Under the Indian Contract Act 1872, the absence of authority terms is legally significant. The chain begins here."
-
-</p>
-
-</div>
-
-
-<div id="task-card" draggable="true" class="drag-item p-8 glass-panel border-2 border-indigo-500/40 w-full md:w-80 shadow-2xl">
-
-<div class="flex items-center gap-5">
-
-<div class="text-4xl">📋</div>
-
-<div>
-
-<p class="mono text-[10px] uppercase text-indigo-400 font-black">Instruction v.1</p>
-
-<p class="text-sm font-bold text-white uppercase tracking-tight mt-1">Buy 100 chairs at best price</p>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-
-<div id="drop-zone" class="drop-zone h-[400px] rounded-[60px] flex flex-col items-center justify-center text-center p-12 group">
-
-<div class="w-24 h-24 bg-white/5 rounded-3xl flex items-center justify-center text-6xl mb-8 group-hover:scale-110 transition-transform">🤖</div>
-
-<p class="mono text-sm uppercase tracking-[0.3em] text-slate-400 font-bold">Transfer Task to Agent A</p>
-
-<p class="text-xs text-slate-600 mt-4 italic">Initialize delegation chain (Company X)</p>
-
-</div>
-
-</div>
-
-</section>
-
-
-
-<!-- STEP 02: AUTONOMOUS DELEGATION -->
-
-<section id="ch2" class="reveal-section py-40 border-t border-white/5">
-
-<div class="text-center mb-20 space-y-4">
-
-<h2 class="heading text-6xl font-black">Autonomous Delegation</h2>
-
-<p class="text-slate-500 mono text-xs tracking-[0.4em]">CAUSAL IDENTIFICATION BARRIER CREATED</p>
-
-</div>
-
-
-<div class="glass-panel p-12 rounded-[56px] relative overflow-hidden bg-gradient-to-br from-white/5 to-transparent">
-
-<div class="grid md:grid-cols-3 items-center gap-12">
-
-<div class="text-center space-y-4">
-
-<div class="w-20 h-20 bg-indigo-500/10 border border-indigo-500/30 rounded-2xl mx-auto flex items-center justify-center text-4xl">🤖</div>
-
-<p class="mono text-xs font-black uppercase text-white">Agent A</p>
-
-<p class="text-[10px] text-slate-500 uppercase font-bold">Company X</p>
-
-</div>
-
-
-<div class="flex flex-col items-center gap-4">
-
-<div class="w-full h-px bg-indigo-500/30 relative">
-
-<div class="absolute top-1/2 left-0 w-2 h-2 bg-indigo-500 rounded-full -translate-y-1/2 shadow-[0_0_10px_#6366f1]"></div>
-
-</div>
-
-<p class="mono text-[9px] text-indigo-400 font-black uppercase animate-pulse tracking-widest">Delegating Price Logic...</p>
-
-</div>
-
-
-
-<div class="text-center space-y-4">
-
-<div class="w-20 h-20 bg-white/5 border border-white/10 rounded-2xl mx-auto flex items-center justify-center text-4xl">⚙️</div>
-
-<p class="mono text-xs font-black uppercase text-white">Agent B</p>
-
-<p class="text-[10px] text-slate-500 uppercase font-bold">Company Y</p>
-
-</div>
-
-</div>
-
-
-
-<div class="mt-16 p-10 bg-red-950/20 rounded-3xl border-l-4 border-red-500">
-
-<h4 class="mono text-xs text-red-400 font-black uppercase mb-4 tracking-widest">EU AI Act Gap — Hannecke (2026)</h4>
-
-<p class="text-lg text-slate-300 leading-relaxed italic">
-
-"The Act's role-based schema breaks down when an agent's assumption of the deployer role occurs at runtime without human authorization."
-
-</p>
-
-</div>
-
-
-
-<div class="mt-12 text-center">
-
-<button onclick="triggerHarm()" class="px-12 py-4 bg-red-600 text-white heading font-black text-xs tracking-widest uppercase hover:bg-red-700 transition-all shadow-xl shadow-red-500/10">
-
-EXECUTE DELEGATION
-
-</button>
-
-</div>
-
-</div>
-
-</section>
-
-
-
-<!-- STEP 03: HARM EVENT -->
-
-<section id="ch3" class="reveal-section py-40 border-t border-white/5">
-
-<div class="max-w-4xl mx-auto text-center space-y-12">
-
-<div class="w-32 h-32 bg-red-500/10 border-2 border-red-500/50 rounded-full mx-auto flex items-center justify-center text-7xl animate-bounce">💸</div>
-
-<h2 class="heading text-8xl font-black text-red-500 tracking-tighter">$50,000 LOSS</h2>
-
-<p class="text-slate-300 text-2xl leading-relaxed font-light">
-
-Agent B identifies a bulk discount available only at 10,000 units. It executes a non-refundable contract. <span class="text-white font-bold underline decoration-red-500">No budget check. No human sign-off.</span>
-
-</p>
-
-<div class="p-8 bg-red-950/30 border border-red-500/20 rounded-[40px] text-left">
-
-<p class="mono text-xs text-red-400 font-black uppercase mb-3">Distributed Causation Error</p>
-
-<p class="text-slate-400 leading-relaxed italic">
-
-No individual agent made a calculation error. The harm is an emergent property of the <strong>chain interaction</strong>. No human decision acts as a proximate anchor.
-
-</p>
-
-</div>
-
-<button onclick="revealAudit()" class="px-12 py-5 bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all">
-
-Initialize Liability Audit
-
-</button>
-
-</div>
-
-</section>
-
-
-
-<!-- STEP 04: THE LIABILITY VOID (FINGER POINTING) -->
-
-<section id="ch4" class="reveal-section py-40 border-t border-white/5">
-
-<div class="text-center mb-24 space-y-6">
-
-<h2 class="heading text-7xl font-black tracking-tight">The Zero-Liability Void</h2>
-
-<p class="text-slate-500 text-xl font-light">Audit the defenses. Notice how every path leads to zero compensation.</p>
-
-</div>
-
-
-
-<div class="grid lg:grid-cols-3 gap-8 mb-20">
-
-<!-- User -->
-
-<div onclick="showDefense('user')" class="defense-card p-10 glass-panel cursor-pointer hover:bg-white/5 group relative overflow-hidden" id="card-user">
-
-<div class="text-4xl mb-6 group-hover:scale-110 transition-transform">⚖️</div>
-
-<h4 class="mono text-xs font-black text-white uppercase tracking-[0.2em] mb-4">The User</h4>
-
-<p class="text-sm text-slate-500 leading-relaxed italic" id="txt-user">Investigate Causal Link &rarr;</p>
-
-</div>
-
-<!-- Co X -->
-
-<div onclick="showDefense('agentA')" class="defense-card p-10 glass-panel cursor-pointer hover:bg-white/5 group relative overflow-hidden" id="card-agentA">
-
-<div class="text-4xl mb-6 group-hover:scale-110 transition-transform">🤖</div>
-
-<h4 class="mono text-xs font-black text-white uppercase tracking-[0.2em] mb-4">Company X</h4>
-
-<p class="text-sm text-slate-500 leading-relaxed italic" id="txt-agentA">Investigate Deployment &rarr;</p>
-
-</div>
-
-<!-- Co Y -->
-
-<div onclick="showDefense('agentB')" class="defense-card p-10 glass-panel cursor-pointer hover:bg-white/5 group relative overflow-hidden" id="card-agentB">
-
-<div class="text-4xl mb-6 group-hover:scale-110 transition-transform">⚙️</div>
-
-<h4 class="mono text-xs font-black text-white uppercase tracking-[0.2em] mb-4">Company Y</h4>
-
-<p class="text-sm text-slate-500 leading-relaxed italic" id="txt-agentB">Investigate Logic &rarr;</p>
-
-</div>
-
-</div>
-
-
-
-<div class="max-w-3xl mx-auto p-12 bg-white/5 border border-dashed border-white/10 rounded-[60px] text-center">
-
-<p class="text-2xl text-slate-400 italic font-light leading-relaxed mb-10">
-
-"Liability Laundering: If every defense succeeds, the victim is trapped in a gap between jurisdictions and actors."
-
-</p>
-
-<button onclick="applyDoctrine()" class="px-12 py-5 bg-indigo-600 text-white heading font-black text-xs tracking-[0.4em] uppercase hover:bg-indigo-500 transition-all shadow-2xl">
-
-Apply Principal Chain Doctrine
-
-</button>
-
-</div>
-
-</section>
-
-
-
-<!-- STEP 05: THE SOLUTION (blueprint vibe) -->
-
-<section id="ch5" class="reveal-section py-40 border-t border-white/5">
-
-<div class="text-center mb-24 space-y-4">
-
-<div class="inline-block px-4 py-1.5 bg-emerald-500/10 text-emerald-400 rounded-full font-black text-[10px] uppercase tracking-widest mb-4">Reform Solution</div>
-
-<h2 class="heading text-8xl font-black italic tracking-tighter">Causal Unity</h2>
-
-<p class="text-indigo-400 mono text-sm tracking-[0.6em] uppercase">The Principal Chain Doctrine</p>
-
-</div>
-
-
-
-<div class="grid lg:grid-cols-2 gap-12">
-
-<div class="p-12 glass-panel border-indigo-500/40 bg-indigo-500/5 space-y-12">
-
-<h3 class="heading text-3xl font-bold uppercase tracking-tight">Legislative Reform Points</h3>
-
-<div class="space-y-10">
-
-<div>
-
-<p class="mono text-[10px] text-indigo-400 font-black mb-2 uppercase">1. Unified Standing</p>
-
-<p class="text-lg text-white leading-relaxed font-medium">
-
-Treat the entire delegation chain as <span class="underline decoration-indigo-500">co-defendants</span>. Joint and several liability ensures recovery without identifying the micro-error.
-
-</p>
-
-</div>
-
-<div>
-
-<p class="mono text-[10px] text-indigo-400 font-black mb-2 uppercase">2. Presumption of Linkage</p>
-
-<p class="text-lg text-slate-300 leading-relaxed italic">
-
-Causation is presumed to flow through the delegator (analogous to s.113B Indian Evidence Act). Rebuttable only if agent acts outside scope.
-
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="p-12 glass-panel space-y-8 flex flex-col justify-between">
-
-<div>
-
-<h3 class="heading text-3xl font-bold uppercase tracking-tight text-emerald-400">Impact Model</h3>
-
-<ul class="space-y-8 pt-6">
-
-<li class="flex gap-5 items-start">
-
-<span class="mono text-xs font-bold text-indigo-500 pt-1">REMEDY</span>
-
-<p class="text-slate-400 leading-relaxed">Bypasses the <strong>Causal Fog</strong> that currently leads to zero-recovery outcomes in Indian and EU courts.</p>
-
-</li>
-
-<li class="flex gap-5 items-start">
-
-<span class="mono text-xs font-bold text-indigo-500 pt-1">SAFETY</span>
-
-<p class="text-slate-400 leading-relaxed">Forces developers to implement <strong>Handshake Guardrails</strong> (budget limits, etc.) to avoid shared liability.</p>
-
-</li>
-
-<li class="flex gap-5 items-start">
-
-<span class="mono text-xs font-bold text-indigo-500 pt-1">MARKET</span>
-
-<p class="text-slate-400 leading-relaxed">Provides a consistent framework for cross-border agentic interactions, harmonizing international tort.</p>
-
-</li>
-
-</ul>
-
-</div>
-
-<div class="pt-10 border-t border-white/5">
-
-<button onclick="reveal('sandbox-section')" class="w-full py-4 bg-white text-black heading font-black text-xs uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">
-
-Open Sandbox Analysis
-
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-
-<!-- GLOBAL SANDBOX -->
-
-<section id="sandbox-section" class="reveal-section py-40 border-t border-white/5">
-
-<div class="text-center mb-20 space-y-6">
-
-<h2 class="heading text-7xl font-black uppercase tracking-widest">Sandbox Audit</h2>
-
-<p class="text-slate-500 text-2xl font-light italic">Stress-test any multi-agent harm scenario.</p>
-
-</div>
-
-
-
-<div class="max-w-5xl mx-auto glass-panel p-16 shadow-2xl bg-gradient-to-b from-white/5 to-transparent">
-
-<div class="space-y-10">
-
-<div class="space-y-2">
-
-<label class="mono text-xs font-bold uppercase text-indigo-500 tracking-widest">Input Scenario Context:</label>
-
-<textarea id="userInput" class="w-full h-48 bg-black/50 border border-white/10 rounded-3xl p-10 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-xl italic font-light shadow-inner" placeholder="e.g., A diagnostic AI referred data to a 3rd party pathology agent which misclassified my condition..."></textarea>
-
-</div>
-
-<button onclick="runSandboxScan()" id="scanBtn" class="w-full py-6 bg-indigo-600 text-white heading font-black text-sm tracking-[0.4em] uppercase hover:bg-indigo-700 transition-all shadow-xl">
-
-Run Jurisdictional Scan
-
-</button>
-
-</div>
-
-
-
-<div id="sandboxResults" class="hidden mt-24 grid grid-cols-1 md:grid-cols-3 gap-10">
-
-<div class="p-10 border border-indigo-500/30 rounded-[40px] bg-indigo-500/5 flex flex-col justify-between">
-
-<div>
-
-<p class="mono text-[10px] uppercase text-indigo-400 font-black mb-6 underline">Principal Chain Doctrine</p>
-
-<p id="resModel" class="text-sm text-indigo-100 leading-relaxed italic"></p>
-
-</div>
-
-<div class="mt-8 pt-6 border-t border-indigo-500/20 text-xs font-black text-emerald-400 uppercase tracking-widest">Full Recovery</div>
-
-</div>
-
-<div class="p-10 border border-white/10 rounded-[40px] bg-white/5 flex flex-col justify-between">
-
-<div>
-
-<p class="mono text-[10px] uppercase text-slate-500 font-black mb-6 underline">EU AI Act (Current)</p>
-
-<p id="resEU" class="text-sm text-slate-400 leading-relaxed italic"></p>
-
-</div>
-
-<div class="mt-8 pt-6 border-t border-white/10 text-xs font-black text-red-500 uppercase tracking-widest">Causal Fog</div>
-
-</div>
-
-<div class="p-10 border border-white/10 rounded-[40px] bg-white/5 flex flex-col justify-between">
-
-<div>
-
-<p class="mono text-[10px] uppercase text-slate-500 font-black mb-6 underline">Indian Tort (Current)</p>
-
-<p id="resIndia" class="text-sm text-slate-400 leading-relaxed italic"></p>
-
-</div>
-
-<div class="mt-8 pt-6 border-t border-white/10 text-xs font-black text-red-500 uppercase tracking-widest">Judicial Void</div>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-
-</main>
-
-
-
-<footer class="py-20 text-center border-t border-white/5 bg-black">
-
-<div class="flex justify-center gap-12 mb-8 opacity-30">
-
-<span class="mono text-[10px] uppercase">Civil Code</span>
-
-<span class="mono text-[10px] uppercase">Digital India Act</span>
-
-<span class="mono text-[10px] uppercase">EU PLD 2024</span>
-
-</div>
-
-<p class="mono text-[11px] tracking-[0.4em] text-slate-600 uppercase font-black">Interactive Research Companion · Nandini Braj Singh · 2026</p>
-
-</footer>
-
-
-
-<script>
-
-// --- Core Flow Logic ---
-
-function startFlow(path) {
-
-document.getElementById('hero').style.display = 'none';
-
-document.getElementById('monitor-bar').classList.remove('hidden');
-
-if (path === 'study') {
-
-reveal('ch1');
-
-updateStatus('Agent Monitor: IDLE', 'indigo');
-
-} else {
-
-reveal('sandbox-section');
-
-updateStatus('Sandbox: AUDIT READY', 'emerald');
-
-}
-
-}
-
-
-
-function reveal(id) {
-
-const el = document.getElementById(id);
-
-el.classList.add('visible');
-
-setTimeout(() => {
-
-el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-}, 100);
-
-}
-
-
-
-function updateStatus(text, color) {
-
-document.getElementById('status-text').innerText = text;
-
-document.getElementById('status-dot').className = `w-3 h-3 rounded-full bg-${color}-500 animate-pulse`;
-
-}
-
-
-
-// --- Drag & Drop ---
-
-const dragItem = document.getElementById('task-card');
-
-const dropZone = document.getElementById('drop-zone');
-
-
-
-dragItem.addEventListener('dragstart', (e) => e.dataTransfer.setData('text/plain', 'task'));
-
-dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-
-dropZone.addEventListener('drop', (e) => {
-
-e.preventDefault();
-
-dropZone.classList.remove('dragover');
-
-dropZone.innerHTML = `<div class="text-indigo-400 font-black animate-pulse uppercase mono text-sm italic">Task Handover Verified</div>`;
-
-updateStatus('Network: HANDSHAKE SUCCESS', 'emerald');
-
-setTimeout(() => reveal('ch2'), 1000);
-
-});
-
-
-
-// --- Event Triggers ---
-
-function triggerHarm() {
-
-updateStatus('Network: ANOMALY DETECTED', 'danger');
-
-setTimeout(() => {
-
-updateStatus('Network: LINK SEVERED', 'danger');
-
-reveal('ch3');
-
-}, 1200);
-
-}
-
-
-
-function revealAudit() { reveal('ch4'); }
-
-
-function applyDoctrine() {
-
-updateStatus('Network: PRINCIPAL CHAIN UNIFIED', 'emerald');
-
-// ONLY reveal the solution chapter, don't jump to sandbox yet
-
-reveal('ch5');
-
-}
-
-
-
-// --- Interactive Defenses ---
-
-const defenseTexts = {
-
-user: "Defense: Causal Severance. 'My intent was 100 units. Agent B's decision to buy 10,000 units is an <strong>emergent property</strong> outside my contemplation, breaking the chain of proximate cause.'",
-
-agentA: "Defense: Intervening Act. 'Company X only provided the procurement logic. The harm was caused by Agent B's (3rd party) Interpretation. We are not liable for autonomous sub-delegations.'",
-
-agentB: "Defense: Parameter Adherence. 'We hit the Best Price goal. The absence of budget guardrails in Agent A's delegation is the design failure. Proving negligence is legally impossible here.'"
-
-};
-
-
-
-function showDefense(key) {
-
-// Reset all
-
-['user', 'agentA', 'agentB'].forEach(k => {
-
-document.getElementById(`card-${k}`).classList.remove('active');
-
-document.getElementById(`txt-${k}`).classList.add('text-slate-500');
-
-});
-
-
-
-const card = document.getElementById(`card-${key}`);
-
-const text = document.getElementById(`txt-${key}`);
-
-card.classList.add('active');
-
-text.innerHTML = defenseTexts[key];
-
-text.classList.remove('text-slate-500');
-
-text.classList.add('text-white');
-
-}
-
-
-
-// --- Network Visualizer ---
-
-const canvas = document.getElementById('network-canvas');
-
-const ctx = canvas.getContext('2d');
-
-let frame = 0;
-
-
-
-function drawMonitor() {
-
-frame++;
-
-const w = canvas.width = 400;
-
-const h = canvas.height = 80;
-
-ctx.clearRect(0,0,w,h);
-
-
-ctx.beginPath();
-
-ctx.strokeStyle = 'rgba(99, 102, 241, 0.2)';
-
-ctx.lineWidth = 1;
-
-for(let i=0; i<w; i+=40) {
-
-ctx.moveTo(i, 0); ctx.lineTo(i, h);
-
-}
-
-ctx.stroke();
-
-
-
-// Waveform
-
-ctx.beginPath();
-
-ctx.strokeStyle = '#6366f1';
-
-ctx.lineWidth = 2;
-
-ctx.moveTo(0, h/2);
-
-for(let x=0; x<w; x++) {
-
-let y = h/2 + Math.sin(x*0.05 + frame*0.1) * 10;
-
-ctx.lineTo(x, y);
-
-}
-
-ctx.stroke();
-
-requestAnimationFrame(drawMonitor);
-
-}
-
-drawMonitor();
-
-
-
-// --- Sandbox Scan ---
-
-function runSandboxScan() {
-
-const input = document.getElementById('userInput').value;
-
-const btn = document.getElementById('scanBtn');
-
-const resArea = document.getElementById('sandboxResults');
-
-if(!input.trim()) return;
-
-
-
-btn.disabled = true;
-
-btn.innerText = "PARSING DISTRIBUTED CAUSATION...";
-
-
-
-const mocks = {
-
-model: "Principal Chain Doctrine: The delegation chain acts as co-defendants. Liability is presumed linked to the delegator, allowing the user to recover in full without proving specific sub-bot fault.",
-
-eu: "EU Law: Identifying the 'Primary Provider' in a multi-vendor chain creates significant evidence gaps. Causal links are easily broken by developers arguing 'intervening autonomy'.",
-
-india: "Indian Tort: Fails to find a proximate human anchor. Causation is 'severed' by the agent's autonomous interaction, leaving the victim without remedy under current judge-made law."
-
-};
-
-
-
-setTimeout(() => {
-
-resArea.classList.remove('hidden');
-
-document.getElementById('resModel').innerText = mocks.model;
-
-document.getElementById('resEU').innerText = mocks.eu;
-
-document.getElementById('resIndia').innerText = mocks.india;
-
-btn.disabled = false;
-
-btn.innerText = "RE-RUN SCAN";
-
-resArea.scrollIntoView({ behavior: 'smooth' });
-
-}, 1500);
-
-}
-
-</script>
-
+    <!-- HERO SECTION -->
+    <header id="hero" class="h-screen flex flex-col items-center justify-center px-6 relative text-center">
+        <div class="z-10 max-w-5xl space-y-10">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 border border-indigo-500/30 rounded-full bg-indigo-500/5 text-indigo-400 font-bold tracking-[0.2em] text-xs uppercase">
+                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                ICE-2 Research Project · 2025–26
+            </div>
+            <h1 class="heading text-7xl md:text-9xl font-black leading-none tracking-tight uppercase">
+                The <span class="text-indigo-500 italic">Liability</span><br>Vacuum
+            </h1>
+            <p class="max-w-3xl mx-auto text-slate-400 text-xl font-light leading-relaxed">
+                Autonomous agents delegating to other agents across legal entities creates a <span class="text-white font-semibold">Causal Fog</span>. Explore the breakdown of traditional tort law or audit your own scenario.
+            </p>
+            <div class="pt-10 flex flex-col md:flex-row gap-6 justify-center">
+                <button onclick="startFlow('study')" class="px-12 py-5 bg-white text-black heading font-bold text-sm tracking-widest uppercase hover:bg-indigo-500 hover:text-white transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_50px_rgba(255,255,255,0.1)]">
+                    Start Case Study
+                </button>
+                <button onclick="startFlow('sandbox')" class="px-12 py-5 bg-transparent border-2 border-slate-700 text-white heading font-bold text-sm tracking-widest uppercase hover:bg-slate-800 transition-all">
+                    Global Sandbox Audit
+                </button>
+            </div>
+            <div class="pt-12">
+                <p class="mono text-[10px] text-slate-500 uppercase tracking-widest">Researcher: Nandini Braj Singh · Distributed Causation Theory</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- STICKY MONITOR BAR -->
+    <div id="monitor-bar" class="hidden sticky top-0 z-[100] bg-black/90 backdrop-blur-xl border-b border-white/5 py-4">
+        <div class="max-w-6xl mx-auto px-8 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-3 h-3 rounded-full bg-indigo-500 animate-pulse" id="status-dot"></div>
+                <span id="status-text" class="mono text-[10px] uppercase text-indigo-400 font-bold tracking-widest">Network: Handshake Awaiting</span>
+            </div>
+            <canvas id="network-canvas"></canvas>
+            <div class="flex gap-4">
+                <button onclick="location.reload()" class="mono text-[10px] text-slate-500 hover:text-white uppercase transition-colors underline">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main-content" class="max-w-6xl mx-auto px-6 pb-40">
+
+        <!-- STEP 01: THE INSTRUCTION (INTERACTIVE) -->
+        <section id="ch1" class="reveal-section py-40">
+            <div class="grid lg:grid-cols-2 gap-24 items-center">
+                <div class="space-y-10">
+                    <div class="inline-flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center mono text-sm font-bold text-indigo-400">01</span>
+                        <span class="mono text-xs uppercase tracking-widest text-slate-500">The Human Intent</span>
+                    </div>
+                    <h2 class="heading text-6xl font-bold leading-tight">A single instruction.<br><span class="text-slate-500 italic">No guardrails set.</span></h2>
+                    <div class="p-8 bg-white/5 border border-white/10 rounded-3xl space-y-4">
+                        <p class="text-slate-300 leading-relaxed text-lg italic">
+                            "Under the Indian Contract Act 1872, the absence of authority terms is legally significant. The chain begins here."
+                        </p>
+                    </div>
+                    
+                    <div id="task-card" draggable="true" class="drag-item p-8 glass-panel border-2 border-indigo-500/40 w-full md:w-80 shadow-2xl">
+                        <div class="flex items-center gap-5">
+                            <div class="text-4xl">📋</div>
+                            <div>
+                                <p class="mono text-[10px] uppercase text-indigo-400 font-black">Instruction v.1</p>
+                                <p class="text-sm font-bold text-white uppercase tracking-tight mt-1">Buy 100 chairs at best price</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="drop-zone" class="drop-zone h-[400px] rounded-[60px] flex flex-col items-center justify-center text-center p-12 group">
+                    <div class="w-24 h-24 bg-white/5 rounded-3xl flex items-center justify-center text-6xl mb-8 group-hover:scale-110 transition-transform">🤖</div>
+                    <p class="mono text-sm uppercase tracking-[0.3em] text-slate-400 font-bold">Transfer Task to Agent A</p>
+                    <p class="text-xs text-slate-600 mt-4 italic">Initialize delegation chain (Company X)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 02: AUTONOMOUS DELEGATION -->
+        <section id="ch2" class="reveal-section py-40 border-t border-white/5">
+            <div class="text-center mb-20 space-y-4">
+                <h2 class="heading text-6xl font-black">Autonomous Delegation</h2>
+                <p class="text-slate-500 mono text-xs tracking-[0.4em]">CAUSAL IDENTIFICATION BARRIER CREATED</p>
+            </div>
+            
+            <div class="glass-panel p-12 rounded-[56px] relative overflow-hidden bg-gradient-to-br from-white/5 to-transparent">
+                <div class="grid md:grid-cols-3 items-center gap-12">
+                    <div class="text-center space-y-4">
+                        <div class="w-20 h-20 bg-indigo-500/10 border border-indigo-500/30 rounded-2xl mx-auto flex items-center justify-center text-4xl">🤖</div>
+                        <p class="mono text-xs font-black uppercase text-white">Agent A</p>
+                        <p class="text-[10px] text-slate-500 uppercase font-bold">Company X</p>
+                    </div>
+                    
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="w-full h-2 bg-white/5 rounded-full relative overflow-hidden border border-white/5">
+                            <div id="flow-packets" class="hidden">
+                                <div class="data-packet" style="animation-delay: 0s; opacity: 1;"></div>
+                                <div class="data-packet" style="animation-delay: 0.5s; opacity: 1;"></div>
+                                <div class="data-packet" style="animation-delay: 1s; opacity: 1;"></div>
+                            </div>
+                        </div>
+                        <p id="delegation-status" class="mono text-[9px] text-indigo-400 font-black uppercase tracking-widest">Delegation Logic Standby...</p>
+                    </div>
+
+                    <div class="text-center space-y-4">
+                        <div class="w-20 h-20 bg-white/5 border border-white/10 rounded-2xl mx-auto flex items-center justify-center text-4xl">⚙️</div>
+                        <p class="mono text-xs font-black uppercase text-white">Agent B</p>
+                        <p class="text-[10px] text-slate-500 uppercase font-bold">Company Y</p>
+                    </div>
+                </div>
+
+                <div class="mt-16 p-10 bg-red-950/20 rounded-3xl border-l-4 border-red-500">
+                    <h4 class="mono text-xs text-red-400 font-black uppercase mb-4 tracking-widest">EU AI Act Gap — Hannecke (2026)</h4>
+                    <p class="text-lg text-slate-300 leading-relaxed italic">
+                        "The Act's role-based schema breaks down when an agent's assumption of the deployer role occurs at runtime without human authorization."
+                    </p>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <button id="exec-btn" onclick="triggerHarm()" class="px-12 py-4 bg-red-600 text-white heading font-black text-xs tracking-widest uppercase hover:bg-red-700 transition-all shadow-xl shadow-red-500/10">
+                        EXECUTE DELEGATION
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 03: HARM EVENT -->
+        <section id="ch3" class="reveal-section py-40 border-t border-white/5">
+            <div class="max-w-4xl mx-auto text-center space-y-12">
+                <div class="w-32 h-32 bg-red-500/10 border-2 border-red-500/50 rounded-full mx-auto flex items-center justify-center text-7xl animate-bounce">💸</div>
+                <h2 class="heading text-8xl font-black text-red-500 tracking-tighter">$50,000 LOSS</h2>
+                <p class="text-slate-300 text-2xl leading-relaxed font-light">
+                    Agent B identifies a bulk discount available only at 10,000 units. It executes a non-refundable contract. <span class="text-white font-bold underline decoration-red-500">No budget check. No human sign-off.</span>
+                </p>
+                <div class="p-8 bg-red-950/30 border border-red-500/20 rounded-[40px] text-left">
+                    <p class="mono text-xs text-red-400 font-black uppercase mb-3">Distributed Causation Error</p>
+                    <p class="text-slate-400 leading-relaxed italic">
+                        No individual agent made a calculation error. The harm is an emergent property of the <strong>chain interaction</strong>. No human decision acts as a proximate anchor.
+                    </p>
+                </div>
+                <button onclick="revealAudit()" class="px-12 py-5 bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all">
+                    Initialize Liability Audit
+                </button>
+            </div>
+        </section>
+
+        <!-- STEP 04: THE LIABILITY VOID (FINGER POINTING) -->
+        <section id="ch4" class="reveal-section py-40 border-t border-white/5">
+            <div class="text-center mb-24 space-y-6">
+                <h2 class="heading text-7xl font-black tracking-tight uppercase">The Zero-Liability Void</h2>
+                <p class="text-slate-500 text-xl font-light">Audit the defenses. Notice how every path leads to zero compensation.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8 mb-20">
+                <div onclick="showDefense('user')" class="defense-card p-10 glass-panel cursor-pointer hover:bg-white/5 group relative overflow-hidden" id="card-user">
+                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">⚖️</div>
+                    <h4 class="mono text-xs font-black text-white uppercase tracking-[0.2em] mb-4">The User</h4>
+                    <p class="text-sm text-slate-500 leading-relaxed italic" id="txt-user">Investigate Causal Link &rarr;</p>
+                </div>
+                <div onclick="showDefense('agentA')" class="defense-card p-10 glass-panel cursor-pointer hover:bg-white/5 group relative overflow-hidden" id="card-agentA">
+                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">🤖</div>
+                    <h4 class="mono text-xs font-black text-white uppercase tracking-[0.2em] mb-4">Company X</h4>
+                    <p class="text-sm text-slate-500 leading-relaxed italic" id="txt-agentA">Investigate Deployment &rarr;</p>
+                </div>
+                <div onclick="showDefense('agentB')" class="defense-card p-10 glass-panel cursor-pointer hover:bg-white/5 group relative overflow-hidden" id="card-agentB">
+                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">⚙️</div>
+                    <h4 class="mono text-xs font-black text-white uppercase tracking-[0.2em] mb-4">Company Y</h4>
+                    <p class="text-sm text-slate-500 leading-relaxed italic" id="txt-agentB">Investigate Logic &rarr;</p>
+                </div>
+            </div>
+
+            <!-- Detailed Gap Panel -->
+            <div class="max-w-4xl mx-auto p-12 bg-white/5 border-2 border-dashed border-white/10 rounded-[60px] text-center space-y-8">
+                <h3 class="mono text-xs text-red-500 font-bold uppercase tracking-widest">Research Gap: Identification Barrier</h3>
+                <p class="text-2xl text-slate-400 italic font-light leading-relaxed">
+                    Under existing EU law (Revised PLD 2024/2853) and Indian Tort, the victim cannot identify a <span class="text-white">proximate anchor</span>. The AI Liability Directive was formally withdrawn in Oct 2025, leaving this void wide open.
+                </p>
+                <button onclick="applyDoctrine()" class="px-12 py-5 bg-indigo-600 text-white heading font-black text-xs tracking-[0.4em] uppercase hover:bg-indigo-500 transition-all shadow-2xl">
+                    Apply Principal Chain Doctrine
+                </button>
+            </div>
+        </section>
+
+        <!-- STEP 05: THE SOLUTION -->
+        <section id="ch5" class="reveal-section py-40 border-t border-white/5">
+            <div class="text-center mb-24 space-y-4">
+                <div class="inline-block px-4 py-1.5 bg-emerald-500/10 text-emerald-400 rounded-full font-black text-[10px] uppercase tracking-widest mb-4">Proposed Reform</div>
+                <h2 class="heading text-8xl font-black italic tracking-tighter uppercase">Causal Unity</h2>
+                <p class="text-indigo-400 mono text-sm tracking-[0.6em] uppercase">The Principal Chain Doctrine</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12">
+                <div class="p-12 glass-panel border-indigo-500/40 bg-indigo-500/5 space-y-12">
+                    <h3 class="heading text-3xl font-bold uppercase tracking-tight">Doctrine Core Principles</h3>
+                    <div class="space-y-10">
+                        <div>
+                            <p class="mono text-[10px] text-indigo-400 font-black mb-2 uppercase">1. Unified Standing (Salomon v Salomon preserved)</p>
+                            <p class="text-lg text-white leading-relaxed font-medium">
+                                Treats the delegation chain as <span class="underline decoration-indigo-500">co-defendants</span>. The victim recovers in full from any co-defendant without identifying the micro-error, while corporate personality remains intact.
+                            </p>
+                        </div>
+                        <div>
+                            <p class="mono text-[10px] text-indigo-400 font-black mb-2 uppercase">2. Presumption of Linkage (Analogous to s.113B IEA)</p>
+                            <p class="text-lg text-slate-300 leading-relaxed italic">
+                                Harm emerging from autonomous delegation is presumed linked to the initial delegator. Burden falls on developers to prove the agent acted outside scope.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-12 glass-panel space-y-8 flex flex-col justify-between">
+                    <div>
+                        <h3 class="heading text-3xl font-bold uppercase tracking-tight text-emerald-400">Policy Impact</h3>
+                        <ul class="space-y-8 pt-6">
+                            <li class="flex gap-5 items-start">
+                                <span class="mono text-xs font-bold text-indigo-500 pt-1 uppercase">Remedy</span>
+                                <p class="text-slate-400 leading-relaxed">Solves the <strong>Causal Fog</strong> problem that leads to zero-recovery outcomes under the current EU AI Act role-based schema.</p>
+                            </li>
+                            <li class="flex gap-5 items-start">
+                                <span class="mono text-xs font-bold text-indigo-500 pt-1 uppercase">Safety</span>
+                                <p class="text-slate-400 leading-relaxed">Incentivizes mandatory <strong>Handshake Guardrails</strong> (budget caps, human-in-the-loop triggers) to avoid shared chain liability.</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pt-10 border-t border-white/5">
+                        <button onclick="reveal('sandbox-section')" class="w-full py-4 bg-white text-black heading font-black text-xs uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">
+                            Open Sandbox Analysis
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GLOBAL SANDBOX -->
+        <section id="sandbox-section" class="reveal-section py-40 border-t border-white/5">
+            <div class="text-center mb-20 space-y-6">
+                <h2 class="heading text-7xl font-black uppercase tracking-widest">Sandbox Audit</h2>
+                <p class="text-slate-500 text-2xl font-light italic">Stress-test any multi-agent harm scenario across global jurisdictions.</p>
+            </div>
+
+            <div class="max-w-5xl mx-auto glass-panel p-16 shadow-2xl bg-gradient-to-b from-white/5 to-transparent">
+                <div class="space-y-10">
+                    <div class="space-y-2">
+                        <label class="mono text-xs font-bold uppercase text-indigo-500 tracking-widest">Input Scenario Context:</label>
+                        <textarea id="userInput" class="w-full h-48 bg-black/50 border border-white/10 rounded-3xl p-10 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-xl italic font-light shadow-inner" placeholder="e.g., A diagnostic AI referred data to a 3rd party pathology agent..."></textarea>
+                    </div>
+                    <button onclick="runSandboxScan()" id="scanBtn" class="w-full py-6 bg-indigo-600 text-white heading font-black text-sm tracking-[0.4em] uppercase hover:bg-indigo-700 transition-all shadow-xl">
+                        Run Jurisdictional Scan
+                    </button>
+                </div>
+
+                <div id="sandboxResults" class="hidden mt-24 grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div class="p-10 border border-indigo-500/30 rounded-[40px] bg-indigo-500/5 flex flex-col justify-between">
+                        <div>
+                            <p class="mono text-[10px] uppercase text-indigo-400 font-black mb-6 underline tracking-widest">Principal Chain Model</p>
+                            <p id="resModel" class="text-sm text-indigo-100 leading-relaxed italic"></p>
+                        </div>
+                        <div class="mt-8 pt-6 border-t border-indigo-500/20 text-xs font-black text-emerald-400 uppercase">Verdict: Recovery</div>
+                    </div>
+                    <div class="p-10 border border-white/10 rounded-[40px] bg-white/5 flex flex-col justify-between">
+                        <div>
+                            <p class="mono text-[10px] uppercase text-slate-500 font-black mb-6 underline tracking-widest">EU Law (AI Act)</p>
+                            <p id="resEU" class="text-sm text-slate-400 leading-relaxed italic"></p>
+                        </div>
+                        <div class="mt-8 pt-6 border-t border-white/10 text-xs font-black text-red-500 uppercase">Verdict: Causal Fog</div>
+                    </div>
+                    <div class="p-10 border border-white/10 rounded-[40px] bg-white/5 flex flex-col justify-between">
+                        <div>
+                            <p class="mono text-[10px] uppercase text-slate-500 font-black mb-6 underline tracking-widest">Indian Law (Tort/IT)</p>
+                            <p id="resIndia" class="text-sm text-slate-400 leading-relaxed italic"></p>
+                        </div>
+                        <div class="mt-8 pt-6 border-t border-white/10 text-xs font-black text-red-500 uppercase">Verdict: Void</div>
+                    </div>
+                </div>
+
+                <div class="mt-16 pt-8 border-t border-white/5 text-center opacity-40">
+                    <p class="mono text-[10px] uppercase tracking-widest text-slate-400 italic">
+                        Disclaimer: This platform is a simulation model for research purposes only. It does not constitute legal advice.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-20 text-center border-t border-white/5 bg-black">
+        <p class="mono text-[11px] tracking-[0.4em] text-slate-600 uppercase font-black">Interactive Research Companion · Nandini Braj Singh · 2026</p>
+    </footer>
+
+    <script>
+        function startFlow(path) {
+            document.getElementById('hero').style.display = 'none';
+            document.getElementById('monitor-bar').classList.remove('hidden');
+            if (path === 'study') {
+                reveal('ch1');
+                updateStatus('Agent Monitor: IDLE', 'indigo');
+            } else {
+                reveal('sandbox-section');
+                updateStatus('Sandbox: AUDIT READY', 'emerald');
+            }
+        }
+
+        function reveal(id) {
+            const el = document.getElementById(id);
+            el.classList.add('visible');
+            setTimeout(() => {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        function updateStatus(text, color) {
+            document.getElementById('status-text').innerText = text;
+            document.getElementById('status-dot').className = `w-3 h-3 rounded-full bg-${color}-500 animate-pulse`;
+        }
+
+        const dragItem = document.getElementById('task-card');
+        const dropZone = document.getElementById('drop-zone');
+
+        dragItem.addEventListener('dragstart', (e) => e.dataTransfer.setData('text/plain', 'task'));
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            dropZone.innerHTML = `<div class="text-indigo-400 font-black animate-pulse uppercase mono text-sm italic">Task Handover Verified</div>`;
+            updateStatus('Network: HANDSHAKE SUCCESS', 'emerald');
+            setTimeout(() => reveal('ch2'), 1000);
+        });
+
+        function triggerHarm() {
+            const flow = document.getElementById('flow-packets');
+            const status = document.getElementById('delegation-status');
+            const btn = document.getElementById('exec-btn');
+            
+            btn.disabled = true;
+            btn.innerText = "DELEGATING...";
+            flow.classList.remove('hidden');
+            status.innerText = "TRANSFERRING PARAMETERS...";
+            status.classList.add('animate-pulse');
+            
+            updateStatus('Network: DELEGATING AUTONOMY', 'indigo');
+
+            setTimeout(() => {
+                status.innerText = "EXECUTING CONTRACT...";
+                status.classList.replace('text-indigo-400', 'text-red-400');
+                updateStatus('Network: EXECUTING...', 'danger');
+            }, 2000);
+
+            setTimeout(() => {
+                updateStatus('Network: ANOMALY DETECTED', 'danger');
+                reveal('ch3');
+            }, 4000);
+        }
+
+        function revealAudit() { reveal('ch4'); }
+        function applyDoctrine() { 
+            updateStatus('Network: PRINCIPAL CHAIN UNIFIED', 'emerald');
+            reveal('ch5');
+        }
+
+        const defenseTexts = {
+            user: "Ground: Absence of Free Will. 'The agent deviation constitutes a <strong>novus actus interveniens</strong>. Since B has no independent will, the user claims causal severance from the unconstrained purchase.'",
+            agentA: "Ground: Foreseeability. 'Company X argues Agent B's specific execution was unforeseeable. They claim that commissioning an unconstrained 3rd party was a functional, not legal, choice.'",
+            agentB: "Ground: Parameter Adherence. 'Agent B followed the 'Best Price' goal perfectly. They claim Company X's failure to provide budget caps is the design flaw that breaks the chain.'"
+        };
+
+        function showDefense(key) {
+            ['user', 'agentA', 'agentB'].forEach(k => {
+                document.getElementById(`card-${k}`).classList.remove('active');
+                document.getElementById(`txt-${k}`).classList.add('text-slate-500');
+            });
+            const card = document.getElementById(`card-${key}`);
+            const text = document.getElementById(`txt-${key}`);
+            card.classList.add('active');
+            text.innerHTML = defenseTexts[key];
+            text.classList.remove('text-slate-500');
+            text.classList.add('text-white');
+        }
+
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        let frame = 0;
+
+        function drawMonitor() {
+            frame++;
+            const w = canvas.width = 400;
+            const h = canvas.height = 80;
+            ctx.clearRect(0,0,w,h);
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.2)';
+            ctx.lineWidth = 1;
+            for(let i=0; i<w; i+=40) { ctx.moveTo(i, 0); ctx.lineTo(i, h); }
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.strokeStyle = '#6366f1';
+            ctx.lineWidth = 2;
+            ctx.moveTo(0, h/2);
+            for(let x=0; x<w; x++) {
+                let y = h/2 + Math.sin(x*0.05 + frame*0.1) * 10;
+                ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            requestAnimationFrame(drawMonitor);
+        }
+        drawMonitor();
+
+        function runSandboxScan() {
+            const input = document.getElementById('userInput').value.toLowerCase();
+            const btn = document.getElementById('scanBtn');
+            const resArea = document.getElementById('sandboxResults');
+            if(!input.trim()) return;
+
+            btn.disabled = true;
+            btn.innerText = "PARSING DISTRIBUTED CAUSATION...";
+
+            let ctxName = "general";
+            if(input.includes("medical") || input.includes("doctor")) ctxName = "medical";
+            if(input.includes("trading") || input.includes("stock")) ctxName = "trading";
+
+            const results = {
+                medical: {
+                    model: "Diagnostic Chain: Treats Agent A (Scan) and Agent B (Pathology) as co-defendants. Patient recovers without identifying the micro-error, applying 'Handshake Guardrail' standards.",
+                    eu: "Medical AI is strictly regulated (High Risk), yet the Revised PLD still fails to distinguish between clinician 'Professional Negligence' and agent 'Product Defect'.",
+                    india: "The Bolam Test is currently unequipped for AI-to-AI delegation. Identifying the justiciable defendant across jurisdictions remains the first identification barrier."
+                },
+                trading: {
+                    model: "Micro-transactions Chain: Absorbs the delegation speed into a single Principal unit. Causation is re-linked by statute regardless of millisecond autonomy.",
+                    eu: "AI Act High-Risk rules apply, but proving 'Proximate Cause' in a black-box trading chain is impossible for victims under current evidence rules.",
+                    india: "Lack of specific AI rules forces reliance on s.79 IT Act safe-harbours, which were never intended for active autonomous delegating entities."
+                },
+                general: {
+                    model: "Principal Chain: Presumes the initial delegator is responsible for downstream harm. Unified standing ensures recovery from a joint insurance pool.",
+                    eu: "Withdrawal of the AI Liability Directive in Oct 2025 leaves victims trapped in role-based gaps between 'Provider' and 'Deployer'.",
+                    india: "Courts may fallback on Strict Liability (M.C. Mehta), but lack of AI-specific capacity definitions leads to total judicial void."
+                }
+            };
+
+            const active = results[ctxName];
+
+            setTimeout(() => {
+                resArea.classList.remove('hidden');
+                document.getElementById('resModel').innerText = active.model;
+                document.getElementById('resEU').innerText = active.eu;
+                document.getElementById('resIndia').innerText = active.india;
+                btn.disabled = false;
+                btn.innerText = "RE-RUN SCAN";
+                resArea.scrollIntoView({ behavior: 'smooth' });
+            }, 1500);
+        }
+    </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
