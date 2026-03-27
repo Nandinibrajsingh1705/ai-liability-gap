@@ -886,87 +886,79 @@ function drawMonitor() {
 }
 drawMonitor();
 
-// ── Sandbox — Anthropic API ────────────────────────────────────
+// ── Sandbox — Structural Analysis Engine ───────────────────────
+function getStructuralResponse(input) {
+  const text = input.toLowerCase();
+  
+  // Detection Logic based on Agentic Behavior
+  const isDataIssue = text.includes('data') || text.includes('privacy') || text.includes('info') || text.includes('identity');
+  const isFinancialIssue = text.includes('money') || text.includes('cost') || text.includes('price') || text.includes('buy') || text.includes('wallet');
+  const isActionIssue = text.includes('did') || text.includes('act') || text.includes('order') || text.includes('perform');
+
+  // 1. Principal Chain Doctrine (Reform Perspective)
+  let doctrineResult = "The Principal Chain Doctrine applies joint and several liability across this delegation chain. ";
+  if (isDataIssue) doctrineResult += "The initial 'Data Controller' is held liable for downstream leaks occurring in the 'black-box' processing stage. ";
+  if (isFinancialIssue) doctrineResult += "The deployer's failure to set 'Budget Handshakes' constitutes a breach of the standard of care. ";
+  doctrineResult += "The victim recovers in full from the most proximate solvent entity, solving the identification barrier.";
+
+  // 2. EU Law (Current Gap Perspective)
+  let euResult = "Current EU Law (2026) exhibits a 'Protection Gap' here. ";
+  if (isDataIssue) euResult += "While GDPR Art. 26 covers joint controllers, the AI Act fails to define 'Agentic Sourcing' for data. ";
+  else euResult += "The AI Act's role-based schema (Provider vs. Deployer) breaks down because the autonomous agent assumed the 'deployer' role without human intervention. ";
+  euResult += "With the AI Liability Directive withdrawn, the claimant faces a difficult 'Fault-Based' burden of proof.";
+
+  // 3. Indian Law (Current Barrier Perspective)
+  let indiaResult = "Indian Law faces a 'Causal Severance' problem in this scenario. ";
+  if (isFinancialIssue) indiaResult += "Section 188 of the Contract Act is strained as the agent exceeded 'implied authority' without a human anchor. ";
+  else indiaResult += "Traditional Tort Law requires a human 'Duty of Care'—which is absent in an autonomous sub-delegation. ";
+  indiaResult += "Under CPC 1908, the claimant cannot serve process on a decentralized or cross-border agentic chain.";
+
+  return {
+    doctrine: doctrineResult,
+    eu: euResult,
+    eu_note: isDataIssue ? "GDPR/AI Act Synchronization Gap" : "AI Liability Directive Gap (Oct 2025)",
+    india: indiaResult,
+    india_note: "No AI-specific civil statute in India as of 2026."
+  };
+}
+
 async function runSandboxScan() {
   const input = document.getElementById('userInput').value.trim();
-  if (!input) return;
+  if (!input || input.length < 5) return;
+  
   const btn = document.getElementById('scanBtn');
   const btnText = document.getElementById('scan-btn-text');
   const scanIcon = document.getElementById('scan-icon');
   const spinIcon = document.getElementById('spin-icon');
   const resArea = document.getElementById('sandboxResults');
 
-  btn.disabled = true; btnText.textContent = 'Analysing Legal Chains...';
-  scanIcon.style.display = 'none'; spinIcon.style.display = 'inline-block';
+  // Loading State
+  btn.disabled = true; 
+  btnText.textContent = 'Mapping Chain Logic...';
+  scanIcon.style.display = 'none'; 
+  spinIcon.style.display = 'inline-block';
   resArea.classList.add('hidden');
 
-  const sys = `You are a legal analysis assistant for an AI and Law research project on civil liability for cascading multi-agent AI systems.
+  // Simulated Delay for Immersive Experience
+  await new Promise(resolve => setTimeout(resolve, 1500));
 
-FRAMEWORK 1 — PRINCIPAL CHAIN DOCTRINE (Proposed legislative reform — NOT current law):
-- Joint and several liability for all deployers in a causally connected agent delegation chain as co-defendants
-- Preserves separate corporate personalities (Salomon v Salomon [1897] AC 22) — concurrent liability, not veil-piercing
-- Presumption of Linkage: initial delegating agent's deployer presumed responsible for downstream harm. Rebuttable only if downstream agent acted entirely outside scope of delegation. Addresses evidentiary opacity of black-box architectures by shifting burden to developers who hold the architectural blueprint
-- Requires express statutory enactment — cannot be introduced by judicial innovation under CPC 1908 / IEA 1872. Analogous to s.113B IEA
-- Handshake Guardrails (budget limits, scope constraints, human approval triggers) are the standard of care
-- Contractual exclusion clauses require statutory anti-avoidance (analogous to UCTA 1977 / s.2(r) CPA 2019)
+  // Get Structural Response
+  const p = getStructuralResponse(input);
 
-FRAMEWORK 2 — EU LAW (Current law 2026):
-- EU AI Act (2024/1689): risk-based, NO definition of agentic AI, role schema breaks down when agent commissions another agent at runtime
-- Revised PLD (2024/2853): strict liability for software/AI, single-product architecture only
-- AI Liability Directive: WITHDRAWN October 2025 — protection gap, fault-based liability unharmonised
-- Novus actus interveniens defence: developers argue autonomous downstream decision severs causal chain
+  // Update UI Elements
+  document.getElementById('resModel').textContent = p.doctrine;
+  document.getElementById('resEU').textContent = p.eu;
+  document.getElementById('resIndia').textContent = p.india;
+  document.getElementById('eu-note-text').textContent = p.eu_note;
+  document.getElementById('india-note-text').textContent = p.india_note;
+  
+  // Finalize UI
+  resArea.classList.remove('hidden');
+  resArea.scrollIntoView({behavior:'smooth', block:'center'});
 
-FRAMEWORK 3 — INDIAN LAW (Current law 2026):
-- Tort: proximate causation must anchor to a human decision — fails when no human is proximately responsible
-- M.C. Mehta AIR 1987 SC 1086: absolute liability for hazardous activities only — whether AI deployment qualifies is an open question; negligence is primary basis here
-- CPA 2019 Chapter VI: product liability — does not define AI agents or multi-agent chains
-- IT Act 2000 s.79: safe harbour for passive intermediaries — contested for active delegating agents
-- DPDP Act 2023: data processing only, no AI liability regime
-- No AI-specific liability statute in India as of 2026
-- Identification Barrier: no jurisdiction rule for cross-border agent delegation chains
-
-Respond ONLY with valid JSON, no markdown:
-{"doctrine":"2-3 sentences specific to this scenario","eu":"2-3 sentences on EU law failure","eu_note":"one short note","india":"2-3 sentences on Indian law failure","india_note":"one short note"}`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:900,
-        system: sys,
-        messages:[{role:'user', content:`Analyse this multi-agent AI harm scenario: ${input}`}]
-      })
-    });
-    const data = await res.json();
-    const raw = data.content?.[0]?.text || '';
-    let p;
-    try { p = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
-    catch {
-      p = {
-        doctrine:"Under the Principal Chain Doctrine, all deployers in the delegation chain are co-defendants subject to joint and several liability. The victim recovers in full from any defendant without identifying the specific proximate error.",
-        eu:"Current EU law fails across autonomous agent chains. The AI Act lacks agentic provisions and the AI Liability Directive was withdrawn in October 2025, leaving a significant protection gap.",
-        eu_note:"AI Liability Directive withdrawn Oct 2025.",
-        india:"Indian tort law requires a proximate human decision as the fault anchor — absent here. No AI statute exists and the Identification Barrier prevents finding a justiciable defendant across jurisdictions.",
-        india_note:"No AI-specific statute in India as of 2026."
-      };
-    }
-    document.getElementById('resModel').textContent = p.doctrine;
-    document.getElementById('resEU').textContent = p.eu;
-    document.getElementById('resIndia').textContent = p.india;
-    document.getElementById('eu-note-text').textContent = p.eu_note || '';
-    document.getElementById('india-note-text').textContent = p.india_note || '';
-    resArea.classList.remove('hidden');
-    resArea.scrollIntoView({behavior:'smooth'});
-  } catch(err) {
-    console.error(err);
-    document.getElementById('resModel').textContent = 'Analysis unavailable. Check connection and retry.';
-    resArea.classList.remove('hidden');
-  } finally {
-    btn.disabled = false; btnText.textContent = 'Re-Run Scan';
-    scanIcon.style.display = 'inline'; spinIcon.style.display = 'none';
-  }
+  btn.disabled = false; 
+  btnText.textContent = 'Re-Run Structural Audit';
+  scanIcon.style.display = 'inline'; 
+  spinIcon.style.display = 'none';
 }
-</script>
-</body>
 </html>
